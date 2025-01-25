@@ -8,7 +8,17 @@ import axios from "axios";
 import Link from "next/link";
 import AceCodeEditor from "./AceEditor";
 
-type SupportedLanguage = "python" | "javascript" | "java" | "cpp";
+type SupportedLanguage = "python" | "javascript" | "java" | "cpp" | "go" | 'cs' | 'c';
+
+const languageMapping = {
+  python: 'py',
+  javascript: "js",
+  java: "java",
+  cpp: "cpp",
+  go: "go",
+  cs: "cs",
+  c: "c"
+};
 
 const LANGUAGE_TEMPLATES: Record<SupportedLanguage, string> = {
   python: `def solution():
@@ -35,7 +45,15 @@ int main() {
     // Write your code here
     cout << "Hello World!" << endl;
     return 0;
-}`
+}`,
+  go: `package main`,
+  cs: `using System;`,
+  c: `#include <stdio.h>
+    int main() {
+    // Write your code here
+    cout << "Hello World!" << endl;
+    return 0;
+  }`,
 };
 
 export default function CodeEditor() {
@@ -66,7 +84,7 @@ export default function CodeEditor() {
         "http://localhost:8080/",
         {
           code,
-          language: "js", // TODO
+          language: languageMapping[language],
           input: "" // Add input field if needed
         }
       );
@@ -98,6 +116,9 @@ export default function CodeEditor() {
             <option value="python">Python</option>
             <option value="java">Java</option>
             <option value="cpp">C++</option>
+            <option value="go">Go</option>
+            <option value="cs">C#</option>
+            <option value="c">C</option>
           </select>
           <div className="flex gap-2">
             <button
@@ -165,5 +186,5 @@ export default function CodeEditor() {
 
 // Type guard for language validation
 function isValidLanguage(language: string): language is SupportedLanguage {
-  return ["python", "javascript", "java", "cpp"].includes(language);
+  return ["python", "javascript", "java", "cpp", "go", "cs", "c"].includes(language);
 }
