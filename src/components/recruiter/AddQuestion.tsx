@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { API_BASE_URL } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function AddQuestionDialog({ onAdd }: { onAdd: (question: any) => void }) {
     const { toast } = useToast();
+    const [showDialog, setShowDialog] = useState(false);
     const form = useForm({
         defaultValues: {
             title: "",
@@ -33,6 +35,10 @@ export default function AddQuestionDialog({ onAdd }: { onAdd: (question: any) =>
                 title: "Question Added",
                 description: "Your question has been added successfully.",
             });
+            // Reset the form & close the dialog
+            form.reset();
+            form.clearErrors();
+            setShowDialog(false);
         } catch (error) {
             console.error(error);
             toast({
@@ -44,9 +50,9 @@ export default function AddQuestionDialog({ onAdd }: { onAdd: (question: any) =>
     };
 
     return (
-        <Dialog>
+        <Dialog open={showDialog} onOpenChange={() => setShowDialog(!showDialog)}>
             <DialogTrigger asChild>
-                <Button type="button">Add Question</Button>
+                <Button type="button" onClick={() => setShowDialog(true)}>Add Question</Button>
             </DialogTrigger>
             <DialogContent className="bg-gray-900/50 border-gray-700 !text-[#ffff]">
                 <Form {...form}>

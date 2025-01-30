@@ -58,14 +58,6 @@ export default function Dashboard() {
     }
   };
 
-  const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    toast({
-      title: "Link copied",
-      description: "Interview link has been copied to clipboard",
-    });
-  };
-
   const handleDelete = (interview: Interview) => {
     setDeleteDialog({ open: true, interview });
   };
@@ -132,7 +124,7 @@ export default function Dashboard() {
           <div className="grid gap-4">
             {interviews.map((interview) => (
               <div
-                key={interview.id}
+                key={interview._id}
                 className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700"
               >
                 <div>
@@ -153,7 +145,7 @@ export default function Dashboard() {
                       <Share2 className="w-4 h-4" /> Share
                     </Button>
                   )}
-                  <Button 
+                  <Button
                     size="sm"
                     onClick={() => handleEdit(interview)}
                     className="gap-2 bg-indigo-600 hover:bg-indigo-700"
@@ -179,31 +171,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      <Dialog open={shareDialog.open} onOpenChange={(open) => setShareDialog({ open })}>
-        <DialogContent className="bg-gray-800 border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-gray-200">Share Interview</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Copy the link below to share this interview with candidates
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-2">
-            <Input
-              value={`${typeof window && window.location.origin}${shareDialog.link}`}
-              readOnly
-              className="bg-gray-900/50 border-gray-700 text-white"
-            />
-            <Button
-              onClick={() => copyToClipboard(`${typeof window && window.location.origin}${shareDialog.link}`)}
-              className="gap-2 bg-indigo-600 hover:bg-indigo-700"
-            >
-              <ExternalLink className="w-4 h-4" /> Copy
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
+      <ShareDialog shareDialog={shareDialog} setShareDialog={setShareDialog} />
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open })}>
         <AlertDialogContent className="bg-gray-800 border-gray-700">
           <AlertDialogHeader>
@@ -216,7 +184,7 @@ export default function Dashboard() {
             <AlertDialogCancel className="border-gray-700 text-gray-200 hover:bg-gray-800">
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"
             >
@@ -229,6 +197,43 @@ export default function Dashboard() {
   );
 }
 
+function ShareDialog({ shareDialog, setShareDialog }: { shareDialog: any; setShareDialog: any }) {
+  const { toast } = useToast();
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    toast({
+      title: "Link copied",
+      description: "Interview link has been copied to clipboard",
+    });
+    // Close the dialog after copying
+    setShareDialog({ open: false });
+  };
+  return (
+    <Dialog open={shareDialog.open} onOpenChange={(open) => setShareDialog({ open })}>
+      <DialogContent className="bg-gray-800 border-gray-700">
+        <DialogHeader>
+          <DialogTitle className="text-gray-200">Share Interview</DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Copy the link below to share this interview with candidates
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex gap-2">
+          <Input
+            value={`${typeof window && window.location.origin}${shareDialog.link}`}
+            readOnly
+            className="bg-gray-900/50 border-gray-700 text-white"
+          />
+          <Button
+            onClick={() => copyToClipboard(`${typeof window && window.location.origin}${shareDialog.link}`)}
+            className="gap-2 bg-indigo-600 hover:bg-indigo-700"
+          >
+            <ExternalLink className="w-4 h-4" /> Copy
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
 function StatCard({
   title,
   value,
