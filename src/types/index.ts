@@ -37,3 +37,31 @@ export interface RootState {
   auth: AuthState;
   code: CodeState;
 }
+
+export type QuestionType = {
+  id?: string;
+  _id?: string;
+  type: "mcq" | "coding" | "behavioral" | "oneword" | "multiselect";
+  text: string;
+  options?: string[];
+  correctAnswer?: number | string; // Updated to allow string for oneword
+  correctAnswers?: number[]; // for multiselect
+  testCases?: {
+    input: string;
+    output: string;
+  }[];
+  includeTestCases?: boolean;
+};
+
+export type Interview = {
+  id?: string;
+  _id?: string;
+  title: string;
+  uniqueLink: string;
+  description: string;
+  duration: string;
+  questions: QuestionType[];
+  status: "draft" | "published";
+  shareLink?: string;
+  createdAt: string;
+};

@@ -1,114 +1,252 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import axios from 'axios';
-import { CalendarIcon, UsersIcon, ActivityIcon } from 'lucide-react';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Plus, Users, Calendar, Activity, Share2, ExternalLink, Trash2, Edit } from "lucide-react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { Interview } from "@/types";
+import axios from "axios";
+import { API_BASE_URL } from "@/lib/utils";
 
-const Dashboard = () => {
-  const [interviews, setInterviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    total: 0,
-    published: 0,
-    draft: 0,
+export default function Dashboard() {
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [shareDialog, setShareDialog] = useState<{ open: boolean; link?: string }>({
+    open: false,
   });
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; interview?: Interview }>({
+    open: false,
+  });
+  const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/recruiter/interviews`);
-        const data = response.data.data;
-        setInterviews(data);
-        const total = data.length;
-        const published = data.filter((i) => i.status === 'published').length;
-        const draft = data.filter((i) => i.status === 'draft').length;
-        setStats({ total, published, draft });
-      } catch (error) {
-        console.error('Error fetching interviews:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchInterviews();
   }, []);
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  const fetchInterviews = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/recruiter/interviews`);
+      setInterviews(response.data.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch interviews",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    toast({
+      title: "Link copied",
+      description: "Interview link has been copied to clipboard",
+    });
+  };
+
+  const handleDelete = (interview: Interview) => {
+    setDeleteDialog({ open: true, interview });
+  };
+
+  const confirmDelete = async () => {
+    if (deleteDialog.interview) {
+      try {
+        await axios.delete(`/api/recruiter/interviews/${deleteDialog.interview.id}`);
+        setInterviews(interviews.filter(i => i.id !== deleteDialog.interview?.id));
+        toast({
+          title: "Interview deleted",
+          description: `${deleteDialog.interview.status === 'draft' ? 'Draft' : 'Interview'} has been deleted successfully`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete interview",
+          variant: "destructive",
+        });
+      } finally {
+        setDeleteDialog({ open: false });
+      }
+    }
+  };
+
+  const handleEdit = (interview: Interview) => {
+    router.push(`/dashboard/edit/${interview.id}`);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary text-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 text-transparent bg-clip-text">Interview Dashboard</h1>
-          <Button onClick={() => router.push('/recruiter/interview/create')} className="gap-2 bg-primary hover:bg-primary/80">
-            + Create Interview
-          </Button>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+            Interview Dashboard
+          </h1>
+          <Link href="/recruiter/interview/create">
+            <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+              <Plus className="w-4 h-4" /> Create Interview
+            </Button>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <Card className="bg-card">
-            <CardContent className="flex items-center">
-              <CalendarIcon className="text-primary w-6 h-6 mr-4" />
-              <div>
-                <h3 className="text-lg font-semibold">Total Interviews</h3>
-                <p className="text-2xl font-bold">{stats.total}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card">
-            <CardContent className="flex items-center">
-              <UsersIcon className="text-primary w-6 h-6 mr-4" />
-              <div>
-                <h3 className="text-lg font-semibold">Published Interviews</h3>
-                <p className="text-2xl font-bold">{stats.published}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card">
-            <CardContent className="flex items-center">
-              <ActivityIcon className="text-primary w-6 h-6 mr-4" />
-              <div>
-                <h3 className="text-lg font-semibold">Draft Interviews</h3>
-                <p className="text-2xl font-bold">{stats.draft}</p>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            title="Total Interviews"
+            value={interviews.length.toString()}
+            icon={<Calendar className="w-8 h-8 text-indigo-500" />}
+          />
+          <StatCard
+            title="Published Interviews"
+            value={interviews.filter(i => i.status === "published").length.toString()}
+            icon={<Users className="w-8 h-8 text-indigo-500" />}
+          />
+          <StatCard
+            title="Draft Interviews"
+            value={interviews.filter(i => i.status === "draft").length.toString()}
+            icon={<Activity className="w-8 h-8 text-indigo-500" />}
+          />
         </div>
 
-        <div className="bg-card rounded-lg p-6 border">
-          <h2 className="text-xl font-bold mb-4">Recent Interviews</h2>
-          {interviews.length === 0 ? (
-            <div className="text-center text-muted-foreground">No interviews created yet. Click "Create Interview" to get started.</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {interviews.map((interview) => (
-                <Card key={interview._id} className="shadow-md bg-background border">
-                  <CardContent>
-                    <h3 className="text-lg font-semibold text-white mb-2">{interview.title}</h3>
-                    <p className="text-sm text-muted-foreground">Job Role: {interview.jobRole}</p>
-                    <p className="text-sm text-muted-foreground">Status: {interview.status}</p>
-                    <div className="mt-4 flex justify-between items-center">
-                      <Button variant="link" onClick={() => router.push(`/recruiter/interview/${interview._id}`)} className="text-primary">
-                        View Details
-                      </Button>
-                      <span className="text-sm text-muted-foreground">{new Date(interview.createdAt).toLocaleDateString()}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
+          <h2 className="text-xl font-semibold mb-4 text-gray-200">Recent Interviews</h2>
+          <div className="grid gap-4">
+            {interviews.map((interview) => (
+              <div
+                key={interview.id}
+                className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700"
+              >
+                <div>
+                  <h3 className="font-medium text-gray-200">{interview.title}</h3>
+                  <p className="text-sm text-gray-400">
+                    {new Date(interview.createdAt).toLocaleDateString()} • {interview.questions.length} questions
+                    • {interview.status === "draft" ? "Draft" : "Published"}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {interview.status === "published" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShareDialog({ open: true, link: "/live/" + interview?.uniqueLink })}
+                      className="gap-2 bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                    >
+                      <Share2 className="w-4 h-4" /> Share
+                    </Button>
+                  )}
+                  <Button 
+                    size="sm"
+                    onClick={() => handleEdit(interview)}
+                    className="gap-2 bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    <Edit className="w-4 h-4" /> Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(interview)}
+                    className="text-gray-400 hover:text-red-400"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {interviews.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                No interviews created yet. Click "Create Interview" to get started.
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      <Dialog open={shareDialog.open} onOpenChange={(open) => setShareDialog({ open })}>
+        <DialogContent className="bg-gray-800 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-gray-200">Share Interview</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Copy the link below to share this interview with candidates
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <Input
+              value={`${typeof window && window.location.origin}${shareDialog.link}`}
+              readOnly
+              className="bg-gray-900/50 border-gray-700 text-white"
+            />
+            <Button
+              onClick={() => copyToClipboard(`${typeof window && window.location.origin}${shareDialog.link}`)}
+              className="gap-2 bg-indigo-600 hover:bg-indigo-700"
+            >
+              <ExternalLink className="w-4 h-4" /> Copy
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open })}>
+        <AlertDialogContent className="bg-gray-800 border-gray-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-gray-200">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              {`Are you sure you want to delete this ${deleteDialog.interview?.status === 'draft' ? 'draft' : 'published interview'}? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-gray-700 text-gray-200 hover:bg-gray-800">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-};
+}
 
-export default Dashboard;
+function StatCard({
+  title,
+  value,
+  icon,
+}: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <Card className="p-6 bg-gray-800/50 backdrop-blur-sm border-gray-700">
+      <div className="flex items-center gap-4">
+        {icon}
+        <div>
+          <p className="text-sm text-gray-400">{title}</p>
+          <p className="text-2xl font-bold text-gray-200">{value}</p>
+        </div>
+      </div>
+    </Card>
+  );
+}
