@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Clock, User, Mail, Video, Mic, LogOut, Info } from 'lucide-react';
 import UserMedia from '@/components/practice/UserMedia';
 import { API_BASE_URL } from '@/lib/utils';
+import { useInterview } from '@/hooks/useInterview';
 
 type InterviewInfo = {
   totalTime: number;

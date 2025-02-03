@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import InterviewLayout from "../live/layout";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
