@@ -26,6 +26,7 @@ export default function Header() {
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/practice', label: 'Practice', icon: Code },
+    { href: '/recruiter/dashboard', label: 'Enterprise', icon: User },
     user && { href: '/dashboard', label: 'Dashboard', icon: Settings },
   ].filter(Boolean);
 

@@ -75,6 +75,13 @@ const MobileMenu = ({
                 Contact
               </Link>
               <Link
+                href="/recruiter/dashboard"
+                className="flex items-center h-12 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                onClick={onClose}
+              >
+                Enterprise
+              </Link>
+              <Link
                 href="/dashboard"
                 className="flex items-center h-12 px-4 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
                 onClick={onClose}
@@ -199,6 +206,12 @@ export default function Home() {
                 className="text-base text-gray-300 hover:text-white transition-colors"
               >
                 Contact
+              </Link>
+              <Link
+                href="/recruiter/dashboard"
+                className="flex items-center h-12 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+              >
+                Enterprise
               </Link>
               <Link href="/dashboard">
                 <button className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors text-base">
