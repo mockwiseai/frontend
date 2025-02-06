@@ -21,16 +21,15 @@ const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
 export default function PracticePage() {
     const router = useRouter();
     const params = useParams();
-    const { interview } = useInterview();
+    const { interview, submitAnswer, setCurrentQuestion, currentQuestion, updateCompletedQuestions } = useInterview();
     const [question, setQuestion] = useState<Question | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { token, user } = useAuth();
     const questionId = params.question;
-    const timer = 30; // Set default timer or get from params if needed
+    const timer = interview?.totalTime || 30;
 
-    console.log(interview);
-    
+
     useEffect(() => {
         const fetchQuestion = async () => {
             try {
@@ -186,7 +185,7 @@ export default function PracticePage() {
                             <UserMedia />
                             <div className="relative bg-gray-900 rounded-lg border border-gray-800 flex flex-col items-center justify-center gap-4 w-full p-8">
                                 <img
-                                    src="https://storage.googleapis.com/leetgpt-images/profiles/american.png"
+                                    src="https://static.vecteezy.com/system/resources/previews/037/920/741/non_2x/ai-generated-smiling-female-manager-interviews-applicant-in-office-for-job-position-hiring-image-for-startups-photo.jpeg"
                                     alt="AI Interviewer Alexa"
                                     className="w-24 h-24 rounded-full object-cover border-4 border-gray-700"
                                 />
@@ -218,7 +217,17 @@ export default function PracticePage() {
                         </div>
                     </div>
                     <div className="h-full">
-                        <CodeEditor />
+                        <CodeEditor onSubmit={(code) => {
+                            if (question) {
+                                updateCompletedQuestions(question._id);
+                                submitAnswer(question._id, code);
+                                // go back to previous page withouth reloading
+                                if (typeof window !== 'undefined') {
+                                    window.history.back();
+                                }
+                            }
+                            console.log("Code submitted");
+                        }} />
                     </div>
                 </div>
             </main>

@@ -28,7 +28,7 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
   const [interviewInfo, setInterviewInfo] = useState<InterviewInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { setUser } = useInterview();
   // State for user details
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: '',
@@ -95,6 +95,7 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
       ...prev,
       [e.target.name]: e.target.value
     }));
+    setUser({ email: userDetails.email, name: userDetails.name });
   };
 
   const handleStart = async () => {
@@ -116,7 +117,11 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
     }
 
     try {
-      // Replace with your actual API endpoint
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      localStorage.setItem('user', JSON.stringify(userDetails));
       const response = await fetch(`${API_BASE_URL}/candidates/start`, {
         method: 'POST',
         headers: {

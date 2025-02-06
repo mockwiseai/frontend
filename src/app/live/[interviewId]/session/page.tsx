@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/utils';
+import { useInterview } from '@/hooks/useInterview';
 
 type Question = {
   questionId: string;
@@ -17,6 +18,12 @@ type InterviewSession = {
   title: string;
   totalTime: number;
   questions: Question[];
+  submission: {
+    answers: {
+      questionId: string;
+      answer: string;
+    }[];
+  };
   status: 'pending' | 'completed' | 'in-progress';
 };
 
@@ -27,12 +34,17 @@ export default function InterviewSession() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { interview } = useInterview();
+
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/recruiter/interviews/session/${params.interviewId}`);
+        let user = localStorage.getItem('user') || JSON.stringify({ email: '' });
+        if (user) user = JSON.parse(user);
+        const response = await fetch(`${API_BASE_URL}/recruiter/interviews/session/${params.interviewId}?email=${user?.email}`);
         if (!response.ok) throw new Error('Failed to fetch interview');
         const data = await response.json();
+
         setSession(data.data);
       } catch (err) {
         setError('Failed to load interview session');
@@ -40,6 +52,7 @@ export default function InterviewSession() {
         setIsLoading(false);
       }
     };
+
 
     fetchSession();
   }, [params.interviewId]);
@@ -82,14 +95,30 @@ export default function InterviewSession() {
                   </div>
                 </div>
                 <button
+                  disabled={session?.submission?.answers?.find((ans: any) => ans.questionId === question.questionId) !== undefined}
                   onClick={() => router.push(`/live/${params.interviewId + "/session/" + question.questionId}`)}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors text-sm"
                 >
-                  Solve Now
+                  {
+                    session?.submission?.answers?.find((ans: any) => ans.questionId === question.questionId)
+                      ? 'Submitted'
+                      : 'Start'
+                  }
                 </button>
               </div>
             </div>
           ))}
+        </div>
+        <div className='flex justify-center mt-8'>
+          <button
+            onClick={() => {
+              
+              router.push(`/live/${interview?._id}/complete`)
+            }}
+            className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+          >
+            Submit Interview
+          </button>
         </div>
       </div>
     </div>

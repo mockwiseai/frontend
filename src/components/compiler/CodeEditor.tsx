@@ -56,7 +56,11 @@ int main() {
   }`,
 };
 
-export default function CodeEditor() {
+export default function CodeEditor({
+  onSubmit,
+}: {
+  onSubmit?: (code: string) => void;
+}) {
   const [code, setCode] = useState(LANGUAGE_TEMPLATES.javascript);
   const [language, setLanguage] = useState<SupportedLanguage>("javascript");
   const [output, setOutput] = useState<string | null>(null);
@@ -138,19 +142,30 @@ export default function CodeEditor() {
                 </>
               )}
             </button>
-            <Link
-              href="/feedback"
-              className="bg-green-500 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 transition-colors font-semibold"
-            >
-              {isLoading ? (
-                <>
-                  <Loader className="animate-spin" size={18} />
-                  Running...
-                </>
-              ) : (
-                <>Submit</>
-              )}
-            </Link>
+            {
+              onSubmit ? (
+                <button
+                  onClick={() => onSubmit(code)}
+                  className="bg-green-500 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 transition-colors"
+                >
+                  Submit
+                </button>
+              )
+                :
+                <Link
+                  href="/feedback"
+                  className="bg-green-500 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 transition-colors font-semibold"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="animate-spin" size={18} />
+                      Running...
+                    </>
+                  ) : (
+                    <>Submit</>
+                  )}
+                </Link>
+            }
           </div>
         </div>
         <div className="w-full h-[60vh]">

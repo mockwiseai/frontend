@@ -41,6 +41,7 @@ type InterviewContextType = {
     updateCompletedQuestions: (questionId: string) => void;
     submitAnswer: (questionId: string, answer: string) => Promise<void>;
     formatTime: (seconds: number) => string;
+    setUser: (user: { email: string; name: string }) => void;
 };
 
 const InterviewContext = createContext<InterviewContextType | null>(null);
@@ -71,7 +72,6 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
                 setQuestions(data?.data?.questions);
                 setTimeRemaining(data?.data?.totalTime * 60);
                 setCompletedQuestions(data.data?.completedQuestions || []);
-                setUser({ email: data.email, name: data.name });
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Unknown error');
             } finally {
@@ -82,6 +82,14 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         fetchInterviewSession();
     }, [params.interviewId]);
 
+    // get user details from local storage
+    useEffect(() => {
+        const userDetails = localStorage.getItem('user');
+        if (userDetails) {
+            setUser(JSON.parse(userDetails));
+        }
+    }, []);
+    
     // Timer management
     useEffect(() => {
         if (!interview || interview.status !== 'in-progress') return;
@@ -112,10 +120,10 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
 
     const handleCompleteInterview = async () => {
         try {
-            await fetch(API_BASE_URL + `/interview/session/${params.interviewId}/complete`, {
+            await fetch(API_BASE_URL + `/interviews/session/${interview?._id}/complete`, {
                 method: 'PUT',
             });
-            router.push(`/interview/${params.interviewId}/complete`);
+            router.push(`/interviews/${params.interviewId}/complete`);
         } catch (err) {
             setError('Failed to complete interview');
         }
@@ -125,13 +133,14 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         if (!user) return;
 
         try {
-            await fetch(API_BASE_URL + '/interview/session/candidate-submissions', {
+            await fetch(API_BASE_URL + '/recruiter/interviews/session/candidate-submissions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    interviewId: params.interviewId,
+                    interviewId: interview?._id,
+                    questionType: 'CodingQuestion',
+                    response: answer,
                     questionId,
-                    answer,
                     email: user.email,
                     name: user.name,
                 }),
@@ -161,6 +170,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
                 updateCompletedQuestions,
                 submitAnswer,
                 formatTime,
+                setUser,
             }
             }
         >
