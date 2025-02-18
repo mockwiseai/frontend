@@ -1,7 +1,6 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Code2, Users, ArrowLeft, BookOpen, Brain } from 'lucide-react';
+import { Code2, Users, ArrowLeft, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import CodingQuestions from '@/components/dashboard/CodingQuestions';

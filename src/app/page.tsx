@@ -5,14 +5,14 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Code2, Brain, Timer, Award, Menu, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="animate-spin rounded-full h-20 w-20 sm:h-32 sm:w-32 border-b-2 border-white"></div>
-    </div>
-  ),
-});
+// const Spline = dynamic(() => import('@splinetool/react-spline'), {
+//   ssr: false,
+//   loading: () => (
+//     <div className="w-full h-full flex items-center justify-center">
+//       <div className="animate-spin rounded-full h-20 w-20 sm:h-32 sm:w-32 border-b-2 border-white"></div>
+//     </div>
+//   ),
+// });
 
 // Mobile Menu Component
 const MobileMenu = ({
@@ -259,10 +259,10 @@ export default function Home() {
                     </div>
                   }
                 >
-                  <Spline
+                  {/* <Spline
                     scene="https://prod.spline.design/6u0mm1zNlsXcYp0h/scene.splinecode"
                     className="w-full h-full"
-                  />
+                  /> */}
                 </Suspense>
               </div>
             </motion.div>
@@ -314,10 +314,10 @@ export default function Home() {
                     </div>
                   }
                 >
-                  <Spline
+                  {/* <Spline
                     scene="https://prod.spline.design/6u0mm1zNlsXcYp0h/scene.splinecode"
                     className="w-full h-full"
-                  />
+                  /> */}
                 </Suspense>
               </div>
             </motion.div>
