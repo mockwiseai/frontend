@@ -61,7 +61,7 @@ export default function LiveInterviewSetup() {
     };
 
     fetchInterviewInfo();
-  }, [interviewId]); // Dependency on interviewId
+  }, [interviewId]);
 
   // Handle media permissions
   useEffect(() => {
