@@ -10,6 +10,7 @@ export interface Question {
   description: string;
   difficulty: 'easy' | 'medium' | 'hard';
   testCases: TestCase[];
+  examples?: any[];
 }
 
 export interface TestCase {

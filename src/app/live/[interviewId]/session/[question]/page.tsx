@@ -21,11 +21,10 @@ const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
 export default function PracticePage() {
     const router = useRouter();
     const params = useParams();
-    const { interview, submitAnswer, setCurrentQuestion, currentQuestion, updateCompletedQuestions } = useInterview();
+    const { interview, submitAnswer, updateCompletedQuestions } = useInterview();
     const [question, setQuestion] = useState<Question | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { token, user } = useAuth();
     const questionId = params.question;
     const timer = interview?.totalTime || 30;
 

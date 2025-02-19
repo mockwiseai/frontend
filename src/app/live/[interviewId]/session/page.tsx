@@ -39,8 +39,8 @@ export default function InterviewSession() {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        let user = localStorage.getItem('user') || JSON.stringify({ email: '' });
-        if (user) user = JSON.parse(user);
+        let userText = localStorage.getItem('user') || JSON.stringify({ email: '' });
+        let user = JSON.parse(userText) as { email: string };
         const response = await fetch(`${API_BASE_URL}/recruiter/interviews/session/${params.interviewId}?email=${user?.email}`);
         if (!response.ok) throw new Error('Failed to fetch interview');
         const data = await response.json();

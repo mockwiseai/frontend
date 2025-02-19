@@ -11,7 +11,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -199,6 +198,14 @@ export default function Dashboard() {
 
 function ShareDialog({ shareDialog, setShareDialog }: { shareDialog: any; setShareDialog: any }) {
   const { toast } = useToast();
+  const [link, setLink] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== undefined) {
+      setLink(window.location.origin + shareDialog.link);
+    }
+  }, [shareDialog.link]);
+
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
     toast({
@@ -219,12 +226,12 @@ function ShareDialog({ shareDialog, setShareDialog }: { shareDialog: any; setSha
         </DialogHeader>
         <div className="flex gap-2">
           <Input
-            value={`${typeof window && window.location.origin}${shareDialog.link}`}
+            value={link}
             readOnly
             className="bg-gray-900/50 border-gray-700 text-white"
           />
           <Button
-            onClick={() => copyToClipboard(`${typeof window && window.location.origin}${shareDialog.link}`)}
+            onClick={() => copyToClipboard(link)}
             className="gap-2 bg-indigo-600 hover:bg-indigo-700"
           >
             <ExternalLink className="w-4 h-4" /> Copy

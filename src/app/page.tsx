@@ -3,7 +3,6 @@ import { useEffect, Suspense, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Code2, Brain, Timer, Award, Menu, X } from 'lucide-react';
-import dynamic from 'next/dynamic';
 
 // const Spline = dynamic(() => import('@splinetool/react-spline'), {
 //   ssr: false,

@@ -21,10 +21,10 @@ interface ProgressStats {
   };
 }
 
-const mockStats: ProgressStats = {
-  codingQuestions: { solved: 45, total: 150 },
-  behavioralQuestions: { solved: 23, total: 50 },
-};
+// const mockStats: ProgressStats = {
+//   codingQuestions: { solved: 45, total: 150 },
+//   behavioralQuestions: { solved: 23, total: 50 },
+// };
 
 const ProgressCard = ({ title, value, total, icon: Icon, color }: any) => (
   <div className="bg-gradient-start/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
@@ -151,7 +151,7 @@ function ProgressOverview() {
         </p>
       </div>
 
-      {data && (
+      {!loading && data && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ProgressCard
             title="Coding Questions"

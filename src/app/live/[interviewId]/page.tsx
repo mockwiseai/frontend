@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
-import { Clock, User, Mail, Video, Mic, LogOut, Info } from 'lucide-react';
+import { Clock, User, Mail, Video, Mic, Info } from 'lucide-react';
 import UserMedia from '@/components/practice/UserMedia';
 import { API_BASE_URL } from '@/lib/utils';
 import { useInterview } from '@/hooks/useInterview';
@@ -23,33 +23,31 @@ type UserDetails = {
   email: string;
 };
 
-export default function LiveInterviewSetup({ params }: { params: { interviewId: string } }) {
-  // State for interview information
+export default function LiveInterviewSetup() {
+  const router = useRouter();
+  const { interviewId } = router.query; // Dynamically get interviewId from the URL
+
   const [interviewInfo, setInterviewInfo] = useState<InterviewInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { setUser } = useInterview();
-  // State for user details
+
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: '',
     email: '',
   });
 
-  // Media permission states
   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [mediaError, setMediaError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const router = useRouter();
 
-  // Fetch interview information
   useEffect(() => {
+    if (!interviewId) return; // Wait until interviewId is available
+
     const fetchInterviewInfo = async () => {
       try {
         setIsLoading(true);
-        // Replace with your actual API endpoint
-        console.log(params.interviewId);
-        
-        const response = await fetch(`${API_BASE_URL}/recruiter/interviews/unique-link/${params.interviewId}`);
+        const response = await fetch(`${API_BASE_URL}/recruiter/interviews/unique-link/${interviewId}`);
         if (!response.ok) {
           throw new Error('Interview not found');
         }
@@ -63,7 +61,7 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
     };
 
     fetchInterviewInfo();
-  }, []);
+  }, [interviewId]); // Dependency on interviewId
 
   // Handle media permissions
   useEffect(() => {
@@ -76,6 +74,7 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
           videoRef.current.play();
         }
       } catch (err) {
+        console.error('Failed to get media permissions:', err);
         setMediaError('Camera and microphone access is required for the interview.');
       }
     };
@@ -91,9 +90,9 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
   }, []);
 
   const handleDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserDetails(prev => ({
+    setUserDetails((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
     setUser({ email: userDetails.email, name: userDetails.name });
   };
@@ -109,7 +108,6 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
       return;
     }
 
-    // Add validation for email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(userDetails.email)) {
       setError('Please enter a valid email address');
@@ -128,7 +126,7 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          interviewId: params.interviewId,
+          interviewId,
           ...userDetails,
         }),
       });
@@ -137,7 +135,7 @@ export default function LiveInterviewSetup({ params }: { params: { interviewId: 
         throw new Error('Failed to start interview');
       }
 
-      router.push(`/live/${params.interviewId}/session`);
+      router.push(`/live/${interviewId}/session`);
     } catch (err) {
       setError('Failed to start interview. Please try again.');
     }

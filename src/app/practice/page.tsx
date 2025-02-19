@@ -29,7 +29,7 @@ export default function PracticePage() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { token, user } = useAuth();
+  const { token } = useAuth();
 
   const difficulty = searchParams?.get("difficulty") || "medium";
   const timer = parseInt(searchParams?.get("timer") || "30");

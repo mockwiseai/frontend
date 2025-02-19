@@ -112,7 +112,7 @@ export default function CreateInterview() {
     const questions = form.getValues("questions");
     form.setValue(
       "questions",
-      questions.filter((_, i) => i !== index)
+      questions.filter((_: any, i: number) => i !== index)
     );
   };
 
@@ -221,7 +221,7 @@ export default function CreateInterview() {
                   <AddQuestionDialog onAdd={handleAddQuestion} />
                 </div>
 
-                {form.watch("questions").map((question, index) => (
+                {form.watch("questions").map((question: any, index: number) => (
                   <Card key={index} className="p-4 my-4 bg-gray-900/50 border-gray-700 !text-[#ffff]">
                     <div className="flex justify-between items-center">
                       <div >
