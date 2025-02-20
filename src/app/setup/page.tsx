@@ -68,6 +68,7 @@ export default function Setup() {
         difficulty,
         timer,
         showTests: showTestCases.toString(),
+        showCompiler: showCompiler.toString(),
       }).toString();
       router.push(`/practice?${query}`);
     }
@@ -199,7 +200,7 @@ export default function Setup() {
                           : 'translate-x-0 bg-white'
                         }`}
                     ></div>
-                    
+
                   </div>
                 </label>
               </div>
