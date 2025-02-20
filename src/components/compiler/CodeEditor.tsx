@@ -85,7 +85,7 @@ export default function CodeEditor({
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/",
+        process.env.NEXT_PUBLIC_COMPILER_URL || "",
         {
           code,
           language: languageMapping[language],

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   // Remove the extra 'api' in the baseURL
-  baseURL: 'http://localhost:8000', // Changed from 'http://localhost:8000/api'
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -23,7 +23,7 @@ export default function PracticePage() {
   const router = useRouter();
   const { transcript, error: transcriptionError, setIsRecording, isRecording } = useLiveTranscription();
   console.log(transcript, transcriptionError);
-  
+
 
   const searchParams = useSearchParams();
   const [question, setQuestion] = useState<Question | null>(null);
@@ -34,6 +34,7 @@ export default function PracticePage() {
   const difficulty = searchParams?.get("difficulty") || "medium";
   const timer = parseInt(searchParams?.get("timer") || "30");
   const showTests = searchParams?.get("showTests") === "true";
+  const showCompiler = searchParams?.get("showCompiler") === "true";
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -212,7 +213,9 @@ export default function PracticePage() {
 
           {/* Right Side: Code Editor */}
           <div className="h-full">
-            <CodeEditor />
+            {showCompiler &&
+              <CodeEditor />
+            }
           </div>
         </div>
       </main>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function GET(request: Request) {
   try {

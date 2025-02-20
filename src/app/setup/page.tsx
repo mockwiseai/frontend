@@ -23,6 +23,7 @@ export default function Setup() {
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [timer, setTimer] = useState<Timer>('30');
   const [showTestCases, setShowTestCases] = useState<boolean>(false);
+  const [showCompiler, setShowCompiler] = useState<boolean>(false);
   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -194,6 +195,34 @@ export default function Setup() {
                     <div className="block bg-gray-700 w-12 h-7 rounded-full"></div>
                     <div
                       className={`absolute left-1 top-1 w-5 h-5 rounded-full transition-all duration-300 ${showTestCases
+                          ? 'translate-x-5 bg-indigo-500'
+                          : 'translate-x-0 bg-white'
+                        }`}
+                    ></div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Want to show compiler Toggle */}
+              <div className="flex justify-between items-center w-full py-2">
+                <label
+                  htmlFor="toggleCompiler"
+                  className="flex justify-between items-center w-full cursor-pointer"
+                >
+                  <span className="text-base font-medium">
+                    Want to Use Compiler?
+                  </span>
+                  <div className="relative">
+                    <input
+                      id="toggleCompiler"
+                      type="checkbox"
+                      className="sr-only"
+                      checked={showCompiler}
+                      onChange={(e) => setShowCompiler(e.target.checked)}
+                    />
+                    <div className="block bg-gray-700 w-12 h-7 rounded-full"></div>
+                    <div
+                      className={`absolute left-1 top-1 w-5 h-5 rounded-full transition-all duration-300 ${showCompiler
                           ? 'translate-x-5 bg-indigo-500'
                           : 'translate-x-0 bg-white'
                         }`}
