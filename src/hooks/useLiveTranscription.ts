@@ -26,7 +26,7 @@ const useLiveTranscription = (
     const processorRef = useRef<ScriptProcessorNode | null>(null);
 
     useEffect(() => {
-        let pingInterval: ReturnType<typeof setInterval>;
+        // let pingInterval: ReturnType<typeof setInterval>;
 
         const initLiveTranscription = async () => {
             try {
@@ -142,7 +142,7 @@ const useLiveTranscription = (
 
         // Cleanup
         return () => {
-            if (pingInterval) clearInterval(pingInterval);
+            // if (pingInterval) clearInterval(pingInterval);
             console.log("SETISRECORDING:: Cleaning up live transcription", false);
             
             setIsRecording(false);

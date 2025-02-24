@@ -10,6 +10,7 @@ import { baseUrl } from "@/utils/baseUrl";
 import Timer from '@/components/common/Timer';
 import { useAuth } from '@/hooks/useAuth';
 import UserMedia from '@/components/practice/UserMedia';
+import useLiveTranscription from '@/hooks/useLiveTranscription';
 
 const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
   ssr: false,
@@ -20,6 +21,8 @@ const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
 
 export default function PracticePage() {
   const router = useRouter();
+  useLiveTranscription();
+
 
   const searchParams = useSearchParams();
   const [question, setQuestion] = useState<Question | null>(null);
