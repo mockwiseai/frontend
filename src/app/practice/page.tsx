@@ -10,7 +10,6 @@ import { baseUrl } from "@/utils/baseUrl";
 import Timer from '@/components/common/Timer';
 import { useAuth } from '@/hooks/useAuth';
 import UserMedia from '@/components/practice/UserMedia';
-import useLiveTranscription from '@/hooks/useLiveTranscription';
 
 const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
   ssr: false,
@@ -21,9 +20,6 @@ const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
 
 export default function PracticePage() {
   const router = useRouter();
-  const { transcript, error: transcriptionError, setIsRecording, isRecording } = useLiveTranscription();
-  console.log(transcript, transcriptionError);
-
 
   const searchParams = useSearchParams();
   const [question, setQuestion] = useState<Question | null>(null);
@@ -183,11 +179,6 @@ export default function PracticePage() {
                   alt="AI Interviewer Alexa"
                   className="w-24 h-24 rounded-full object-cover border-4 border-gray-700"
                 />
-                <div className=" text-white text-sm font-medium">
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" onClick={(rec) => setIsRecording(!isRecording)}>
-                    {isRecording ? "Stop" : "Start"} Recording
-                  </button>
-                </div>
               </div>
             </div>
             <div className="overflow-y-auto border-r border-gray-800">
