@@ -70,7 +70,7 @@ export default function Setup() {
                 showTests: showTestCases.toString(),
                 showCompiler: showCompiler.toString(),
             }).toString();
-            router.push(`/practice?${query}`);
+            router.push(`/demo/practice?${query}`);
         }
     };
 
