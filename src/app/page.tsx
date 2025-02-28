@@ -277,7 +277,7 @@ export default function Home() {
                 technical interview.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <Link href="/auth/login" className="w-full sm:w-auto">
+                <Link href="/demo/setup" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
