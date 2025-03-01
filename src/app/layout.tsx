@@ -3,6 +3,7 @@ import { Providers } from '@/store/provider';
 import localFont from 'next/font/local';
 import './globals.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Suspense } from 'react';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -37,11 +38,13 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <GoogleOAuthProvider
-            clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET as string}
-          >
-            {children}
-          </GoogleOAuthProvider>
+          <Suspense fallback={null}>
+            <GoogleOAuthProvider
+              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET as string}
+            >
+              {children}
+            </GoogleOAuthProvider>
+          </Suspense>
         </Providers>
       </body>
     </html>
