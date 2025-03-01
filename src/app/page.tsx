@@ -99,31 +99,31 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const splineContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const container = splineContainerRef.current;
-      if (container) {
-        const rect = container.getBoundingClientRect();
-        const event = new MouseEvent('mousemove', {
-          clientX: e.clientX - rect.left,
-          clientY: e.clientY - rect.top,
-          bubbles: true,
-        });
-        container.dispatchEvent(event);
-      }
-    };
+  // useEffect(() => {
+  //   const handleMouseMove = (e: MouseEvent) => {
+  //     const container = splineContainerRef.current;
+  //     if (container) {
+  //       const rect = container.getBoundingClientRect();
+  //       const event = new MouseEvent('mousemove', {
+  //         clientX: e.clientX - rect.left,
+  //         clientY: e.clientY - rect.top,
+  //         bubbles: true,
+  //       });
+  //       container.dispatchEvent(event);
+  //     }
+  //   };
 
-    const container = splineContainerRef.current;
-    if (container) {
-      container.addEventListener('mousemove', handleMouseMove);
-    }
+  //   const container = splineContainerRef.current;
+  //   if (container) {
+  //     container.addEventListener('mousemove', handleMouseMove);
+  //   }
 
-    return () => {
-      if (container) {
-        container.removeEventListener('mousemove', handleMouseMove);
-      }
-    };
-  }, []);
+  //   return () => {
+  //     if (container) {
+  //       container.removeEventListener('mousemove', handleMouseMove);
+  //     }
+  //   };
+  // }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -277,7 +277,7 @@ export default function Home() {
                 technical interview.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <Link href="/demo/setup" className="w-full sm:w-auto">
+                <Link href="/demo/setup?redirect=/demo/setup" className="w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

@@ -11,6 +11,7 @@ import Timer from '@/components/common/Timer';
 import { useAuth } from '@/hooks/useAuth';
 import UserMedia from '@/components/practice/UserMedia';
 import useLiveTranscription from '@/hooks/useLiveTranscription';
+import { demoQuestion } from '@/utils/data';
 
 const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
     ssr: false,
@@ -47,7 +48,7 @@ export default function PracticePage() {
                         },
                     }
                 );
-                setQuestion(response.data.data);
+                setQuestion(demoQuestion as unknown as Question);
             } catch (err) {
                 setError("Failed to fetch question");
                 console.error("Error fetching question:", err);
@@ -154,7 +155,7 @@ export default function PracticePage() {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <button
-                                onClick={() => router.push('/setup')}
+                                onClick={() => router.push('/demo/setup')}
                                 className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
                             >
                                 <ArrowLeft size={20} />

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Clock, BarChart, LogOut, Home, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,10 +28,17 @@ export default function Setup() {
     const [error, setError] = useState<string | null>(null);
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, logout } = useAuth();
+
+    const redirect = searchParams.get('redirect');
 
     useEffect(() => {
         if (!user) {
+            if (redirect) {
+                router.push(`/auth/login?redirect=${redirect}`);
+                return;
+            }
             router.push('/auth/login');
         }
     }, [user, router]);

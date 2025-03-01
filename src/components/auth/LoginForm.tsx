@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, Loader } from 'lucide-react';
@@ -16,6 +16,8 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter();
   const { login } = useAuth();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const [googleLoading, setGoogleloading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,6 +27,10 @@ export default function LoginForm() {
     try {
       const success = await login(email, password);
       if (success) {
+        if (redirect) {
+          router.push(redirect);
+          return;
+        }
         // Changed redirect to services page
         router.push('/services');
       } else {

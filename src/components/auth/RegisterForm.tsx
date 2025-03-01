@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Loader } from 'lucide-react';
@@ -22,7 +22,11 @@ export default function RegisterForm() {
   const [googleLoading, setGoogleloading] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const { register } = useAuth();
+
+  const redirect = searchParams?.get('redirect') || '/setup';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +50,7 @@ export default function RegisterForm() {
       const success = await register(name, email, password);
       console.log('Registration response:', success); // Debug log
       if (success) {
-        router.push('/setup');
+        router.push(redirect);
       }
       // else {
       //   setError('Registration failed');
@@ -86,7 +90,7 @@ export default function RegisterForm() {
         const response = await api.post('/api/auth/register', registerPayload);
         if (response.data.success) {
           localStorage.setItem('token', response.data.data.token);
-          router.push('/setup');
+          router.push(redirect);
         }
       } catch (error: any) {
         setGoogleloading(false);

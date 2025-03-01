@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Sidebar from '@/components/layout/Sidebar';
 
@@ -11,9 +11,14 @@ export default function DashboardLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!isLoading && !user) {
+      if (searchParams.get('redirect')) {
+        router.push(`/auth/login?redirect=${searchParams.get('redirect')}`);
+        return;
+      }
       router.push('/auth/login');
     }
   }, [user, isLoading, router]);
