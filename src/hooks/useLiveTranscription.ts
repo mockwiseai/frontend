@@ -66,7 +66,7 @@ const useLiveTranscription = (
 
         wsRef.current.onopen = () => {
           console.log("WebSocket connected");
-          setIsRecording(true);
+          // setIsRecording(true);
         };
 
         wsRef.current.onmessage = (event: MessageEvent) => {
@@ -123,7 +123,7 @@ const useLiveTranscription = (
         // 7. Process & send audio data
         processorRef.current.onaudioprocess = (e) => {
           // Do not send audio if the server is playing audio
-          if (isPlayingAudio) {
+          if (isPlayingAudio || !isRecording) {
             return;
           }
           // Also skip if WS not open
@@ -193,7 +193,10 @@ const useLiveTranscription = (
     // When audio ends, resume mic capture
     audio.onended = () => {
       console.log("Server audio ended; resuming mic capture");
-      setIsPlayingAudio(false);
+      setTimeout(() => {
+        setIsPlayingAudio(false);
+        setIsRecording(true);
+      }, 2000);
     };
 
     audio.play().catch((error) => {
@@ -202,8 +205,6 @@ const useLiveTranscription = (
       setIsPlayingAudio(false);
     });
   };
-
-  console.log("isRecording:", isRecording);
 
   return { transcript, error, isRecording, setIsRecording };
 };

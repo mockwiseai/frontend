@@ -11,6 +11,7 @@ import Timer from '@/components/common/Timer';
 import { useAuth } from '@/hooks/useAuth';
 import UserMedia from '@/components/practice/UserMedia';
 import useLiveTranscription from '@/hooks/useLiveTranscription';
+import useScriptedInterview from '@/hooks/useScriptedInterview';
 
 const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
   ssr: false,
@@ -21,7 +22,11 @@ const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
 
 export default function PracticePage() {
   const router = useRouter();
-  useLiveTranscription();
+  // useLiveTranscription();
+  useScriptedInterview({
+    baseUrl: process.env.NEXT_PUBLIC_AI_URL || "",
+    sessionId: "1236",
+  });
 
 
   const searchParams = useSearchParams();
