@@ -12,6 +12,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { Question } from '@/types/interview';
 import { API_BASE_URL } from '@/lib/utils';
+import api from '@/services/api';
 
 type InterviewSession = {
     _id: string;
@@ -62,12 +63,8 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const fetchInterviewSession = async () => {
             try {
-                const response = await fetch(API_BASE_URL +
-                    `/recruiter/interviews/unique-link/${params.interviewId}`
-                );
-                if (!response.ok) throw new Error('Failed to fetch interview session');
-
-                const data = await response.json();
+                const response = await api.get(`/api/recruiter/interviews/unique-link/${params.interviewId}`);
+                const data = response.data?.data;
                 setInterview(data?.data);
                 setQuestions(data?.data?.questions);
                 setTimeRemaining(data?.data?.totalTime * 60);
@@ -120,9 +117,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
 
     const handleCompleteInterview = async () => {
         try {
-            await fetch(API_BASE_URL + `/interviews/session/${interview?._id}/complete`, {
-                method: 'PUT',
-            });
+            await api.put(`/api/interviews/session/${interview?._id}/complete`);
             router.push(`/interviews/${params.interviewId}/complete`);
         } catch (err) {
             setError('Failed to complete interview');
@@ -133,7 +128,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
         if (!user) return;
 
         try {
-            await fetch(API_BASE_URL + '/recruiter/interviews/session/candidate-submissions', {
+            await api.post('/api/recruiter/interviews/session/candidate-submissions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

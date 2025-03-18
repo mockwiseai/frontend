@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import { Interview } from "@/types";
 import axios from "axios";
 import { API_BASE_URL } from "@/lib/utils";
+import api from "@/services/api";
 
 export default function Dashboard() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
@@ -46,7 +47,7 @@ export default function Dashboard() {
 
   const fetchInterviews = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/recruiter/interviews`);
+      const response = await api.get(`/api/recruiter/interviews`);
       setInterviews(response.data.data);
     } catch (error) {
       toast({
@@ -64,8 +65,8 @@ export default function Dashboard() {
   const confirmDelete = async () => {
     if (deleteDialog.interview) {
       try {
-        await axios.delete(`/api/recruiter/interviews/${deleteDialog.interview.id}`);
-        setInterviews(interviews.filter(i => i.id !== deleteDialog.interview?.id));
+        await api.delete(`/api/recruiter/interviews/${deleteDialog.interview._id}`);
+        setInterviews(interviews.filter(i => i._id !== deleteDialog.interview?._id));
         toast({
           title: "Interview deleted",
           description: `${deleteDialog.interview.status === 'draft' ? 'Draft' : 'Interview'} has been deleted successfully`,
@@ -83,7 +84,7 @@ export default function Dashboard() {
   };
 
   const handleEdit = (interview: Interview) => {
-    router.push(`/dashboard/edit/${interview.id}`);
+    router.push(`/dashboard/edit/${interview._id}`);
   };
 
   return (

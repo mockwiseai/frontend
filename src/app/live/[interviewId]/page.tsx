@@ -1,11 +1,12 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/router';
+import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Clock, User, Mail, Video, Mic, Info } from 'lucide-react';
 import UserMedia from '@/components/practice/UserMedia';
 import { API_BASE_URL } from '@/lib/utils';
 import { useInterview } from '@/hooks/useInterview';
+import api from '@/services/api';
 
 type InterviewInfo = {
   totalTime: number;
@@ -25,8 +26,9 @@ type UserDetails = {
 
 export default function LiveInterviewSetup() {
   const router = useRouter();
-  const { interviewId } = router.query; // Dynamically get interviewId from the URL
-
+  const params = useParams();
+  const { interviewId } = params;
+  
   const [interviewInfo, setInterviewInfo] = useState<InterviewInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,12 +49,9 @@ export default function LiveInterviewSetup() {
     const fetchInterviewInfo = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_BASE_URL}/recruiter/interviews/unique-link/${interviewId}`);
-        if (!response.ok) {
-          throw new Error('Interview not found');
-        }
-        const data = await response.json();
-        setInterviewInfo(data?.data);
+        const response = await api.get(`/api/recruiter/interviews/unique-link/${interviewId}`);
+        const data = response.data?.data;
+        setInterviewInfo(data); 
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch interview details');
       } finally {

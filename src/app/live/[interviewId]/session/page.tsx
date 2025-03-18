@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/utils';
 import { useInterview } from '@/hooks/useInterview';
+import api from '@/services/api';
 
 type Question = {
   questionId: string;
@@ -41,11 +42,10 @@ export default function InterviewSession() {
       try {
         let userText = localStorage.getItem('user') || JSON.stringify({ email: '' });
         let user = JSON.parse(userText) as { email: string };
-        const response = await fetch(`${API_BASE_URL}/recruiter/interviews/session/${params.interviewId}?email=${user?.email}`);
-        if (!response.ok) throw new Error('Failed to fetch interview');
-        const data = await response.json();
+        const response = await api.get(`/api/recruiter/interviews/session/${params.interviewId}?email=${user?.email}`);
+        const data = response?.data;
 
-        setSession(data.data);
+        setSession(data?.data);
       } catch (err) {
         setError('Failed to load interview session');
       } finally {

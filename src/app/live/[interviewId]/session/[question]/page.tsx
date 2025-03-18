@@ -4,12 +4,10 @@ import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ArrowLeft } from 'lucide-react';
 import { Question, Example, TestCase } from "@/types/question";
-import axios from "axios";
 import Timer from '@/components/common/Timer';
-import { useAuth } from '@/hooks/useAuth';
 import UserMedia from '@/components/practice/UserMedia';
-import { API_BASE_URL } from '@/lib/utils';
 import { useInterview } from '@/hooks/useInterview';
+import api from '@/services/api';
 
 const CodeEditor = dynamic(() => import('@/components/compiler/CodeEditor'), {
     ssr: false,
@@ -23,7 +21,7 @@ export default function PracticePage() {
     const params = useParams();
     const { interview, submitAnswer, updateCompletedQuestions } = useInterview();
     const [question, setQuestion] = useState<Question | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const questionId = params.question;
     const timer = interview?.totalTime || 30;
@@ -33,8 +31,12 @@ export default function PracticePage() {
         const fetchQuestion = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${API_BASE_URL}/recruiter/interviews/questions/${interview?._id}`);
+                const response = await api.get(`/api/recruiter/interviews/questions/${interview?._id}`);
+                console.log("Response:", response);
+                
                 let questions = response.data.data;
+                console.log("Questions:", questions);
+                
                 questions = questions.map((question: Question) => {
                     return {
                         ...question,
@@ -46,12 +48,11 @@ export default function PracticePage() {
                     };
                 });
 
-
-                console.log({ questions });
-
                 setQuestion(questions?.find((q: Question) => q._id === questionId));
+                setLoading(false);
             } catch (err) {
                 setError("Failed to fetch question");
+                setLoading(false);
                 console.error("Error fetching question:", err);
             } finally {
                 setLoading(false);
@@ -60,15 +61,19 @@ export default function PracticePage() {
 
 
 
-        if (interview) {
+        if (interview?._id) {
             fetchQuestion();
         }
     }, [questionId, interview?._id]);
 
+    console.log("Interview:", interview);
+    
     const handleTimeEnd = () => {
         console.log("Time ended");
     };
 
+    console.log("Question:", question);
+    
     const renderExample = (example: Example, index: number) => (
         <div key={index} className="mt-6 space-y-2">
             <h3 className="text-white text-lg">Example {index + 1}:</h3>
@@ -140,7 +145,7 @@ export default function PracticePage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
-                <div className="animate-pulse text-white">Loading...</div>
+                <div className="animate-pulse text-white">Loading3...</div>
             </div>
         );
     }

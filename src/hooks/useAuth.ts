@@ -25,12 +25,12 @@ export function useAuth() {
             // Token is already set in the initialState
           } else {
             // Clear invalid token
-            localStorage.removeItem('token');
+            // localStorage.removeItem('token');
             dispatch(setToken(null));
           }
         } catch (err) {
           console.error('Failed to initialize auth:', err);
-          localStorage.removeItem('token');
+          // localStorage.removeItem('token');
           dispatch(setToken(null));
         } finally {
           dispatch(setLoading(false));
@@ -116,6 +116,7 @@ export function useAuth() {
     try {
       dispatch(setLoading(true));
       dispatch(setError(null));
+      dispatch(setUser(null));
       const response = await authService.getProfile();
       if (response.success) {
         dispatch(setUser(response.data.user));

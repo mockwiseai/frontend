@@ -12,7 +12,8 @@ export default function DashboardLayout({
   const { user, isLoading, getProfile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+  const redirect = searchParams.get('redirect');
+
   useEffect(() => {
     // Check if token exists but user is not loaded
     const hasToken = typeof window !== 'undefined' && localStorage.getItem('token');
@@ -23,7 +24,6 @@ export default function DashboardLayout({
         getProfile();
       } else if (!hasToken && !user) {
         // Only redirect if no token and no user
-        const redirect = searchParams.get('redirect');
         if (redirect) {
           router.push(`/auth/login?redirect=${redirect}`);
         } else {
@@ -31,7 +31,7 @@ export default function DashboardLayout({
         }
       }
     }
-  }, [user, isLoading, router, searchParams, getProfile]);
+  }, [user, isLoading]);
 
   if (isLoading) {
     return (
