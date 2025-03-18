@@ -60,7 +60,7 @@ export default function ServicesPage() {
           </motion.div>
 
           {/* Service Cards */}
-          <div className="grid md:grid-cols-2 gap-4 sm:gap-6 max-w-[800px] mx-auto px-2 sm:px-4">
+          <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mx-auto px-2 sm:px-4">
             {/* Coding Interview Card */}
             <Link href="/setup">
               <motion.div
@@ -100,6 +100,28 @@ export default function ServicesPage() {
               <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">
                 Practice common behavioral questions, get feedback on your
                 responses, and improve your soft skills.
+              </p>
+              <div className="flex items-center text-gray-400 font-medium text-sm sm:text-base">
+                Stay Tuned
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 ml-2 rotate-180" />
+              </div>
+            </motion.div>
+
+            {/* System Design Interview Card (Coming Soon) */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-[#1E1E1E] p-4 sm:p-6 rounded-xl border border-gray-800 opacity-75 relative"
+            >
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-indigo-600 text-white px-2 py-1 rounded-full text-xs sm:text-sm font-medium">
+                Coming Soon
+              </div>
+              <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 mb-4 sm:mb-6" />
+              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-300">
+                System Design Interviews
+              </h3>
+              <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">
+                Learn how to design large-scale systems, practice common
+                questions, and improve your system design skills.
               </p>
               <div className="flex items-center text-gray-400 font-medium text-sm sm:text-base">
                 Stay Tuned

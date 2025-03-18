@@ -153,7 +153,7 @@ function ProgressOverview() {
       </div>
 
       {!loading && data && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ProgressCard
             title="Coding Questions"
             value={`${data?.codingQuestions?.completedCodingQuestions}/${data?.codingQuestions?.totalCodingQuestions}`}
@@ -163,6 +163,13 @@ function ProgressOverview() {
           />
           <ProgressCard
             title="Behavioral Questions"
+            value={`${data?.behavioralQuestions?.completedBehavioralQuestions}/${data?.behavioralQuestions?.totalBehavioralQuestions}`}
+            total={data?.behavioralQuestions?.totalBehavioralQuestions}
+            icon={Users}
+            color="bg-green-500/20 text-[#fff]"
+          />
+          <ProgressCard
+            title="System Design Questions"
             value={`${data?.behavioralQuestions?.completedBehavioralQuestions}/${data?.behavioralQuestions?.totalBehavioralQuestions}`}
             total={data?.behavioralQuestions?.totalBehavioralQuestions}
             icon={Users}
@@ -203,7 +210,7 @@ function ProgressOverview() {
       {/* Quick Actions Section */}
       <div className="text-[#fff]">
         <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <QuickActionButton
             icon={ArrowLeft}
             title="Go back to services"
@@ -222,6 +229,13 @@ function ProgressOverview() {
             icon={Brain}
             title="Practice Behavioral"
             description="Practice interview questions"
+            href="/dashboard?tab=behavioral"
+            color="bg-purple-500/20 text-purple-500"
+          />
+          <QuickActionButton
+            icon={Brain}
+            title="Practice System Design"
+            description="Practice system design questions"
             href="/dashboard?tab=behavioral"
             color="bg-purple-500/20 text-purple-500"
           />

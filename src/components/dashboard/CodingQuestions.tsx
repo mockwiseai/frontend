@@ -7,7 +7,7 @@ import { baseUrl } from '@/utils/baseUrl';
 
 // Types
 interface Question {
-  id: string;
+  _id: string;
   title: string;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
@@ -113,8 +113,8 @@ export default function CodingQuestions() {
               </motion.div>
             ) : (
               <div className="space-y-3">
-                {data.map((question) => (
-                  <motion.div key={question.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {data?.map((question) => (
+                  <motion.div key={question?._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div className="p-4 bg-[#1E1E1E] border border-gray-700 rounded-lg">
                       <h3 className="text-white">{question.title}</h3>
                       <DifficultyBadge difficulty={question.difficulty} />
