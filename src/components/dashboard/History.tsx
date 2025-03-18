@@ -89,8 +89,9 @@ export default function History() {
   };
 
   useEffect(() => {
+    if (!user) return;
     fetchRecentSubmissions();
-  }, []);
+  }, [user]);
 
   // Filter questions based on search and difficulty
   const filteredQuestions = data?.filter((question: any) => {
@@ -174,9 +175,8 @@ export default function History() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-0">
               <div className="relative flex-1">
                 <Search
-                  className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${
-                    isFocused ? 'text-indigo-500' : 'text-gray-400'
-                  }`}
+                  className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${isFocused ? 'text-indigo-500' : 'text-gray-400'
+                    }`}
                 />
                 <input
                   type="text"
@@ -252,11 +252,10 @@ export default function History() {
                               ? handlePageChange(page)
                               : null
                           }
-                          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base min-w-[32px] sm:min-w-[40px] ${
-                            page === currentPage
+                          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base min-w-[32px] sm:min-w-[40px] ${page === currentPage
                               ? 'bg-indigo-600 text-white'
                               : 'bg-[#1E1E1E] border border-gray-700 hover:bg-[#2A2A2A] text-white'
-                          } ${page === '...' ? 'cursor-default' : ''}`}
+                            } ${page === '...' ? 'cursor-default' : ''}`}
                           disabled={page === '...'}
                         >
                           {page}

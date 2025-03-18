@@ -135,9 +135,10 @@ function ProgressOverview() {
   };
 
   useEffect(() => {
+    if (!user) return;
     fetchQuestionsCounters();
     fetchRecentSubmissions();
-  }, []);
+  }, [user]);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">

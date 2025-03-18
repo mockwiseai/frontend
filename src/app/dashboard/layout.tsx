@@ -9,19 +9,29 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, getProfile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  
   useEffect(() => {
-    if (!isLoading && !user) {
-      if (searchParams.get('redirect')) {
-        router.push(`/auth/login?redirect=${searchParams.get('redirect')}`);
-        return;
+    // Check if token exists but user is not loaded
+    const hasToken = typeof window !== 'undefined' && localStorage.getItem('token');
+    
+    if (!isLoading) {
+      if (hasToken && !user) {
+        // If we have a token but no user, try to get the profile
+        getProfile();
+      } else if (!hasToken && !user) {
+        // Only redirect if no token and no user
+        const redirect = searchParams.get('redirect');
+        if (redirect) {
+          router.push(`/auth/login?redirect=${redirect}`);
+        } else {
+          router.push('/auth/login');
+        }
       }
-      router.push('/auth/login');
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router, searchParams, getProfile]);
 
   if (isLoading) {
     return (
@@ -31,7 +41,9 @@ export default function DashboardLayout({
     );
   }
 
-  if (!user) {
+  // Check for token before returning null
+  const hasToken = typeof window !== 'undefined' && localStorage.getItem('token');
+  if (!user && !hasToken) {
     return null;
   }
 

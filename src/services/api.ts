@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // Remove the extra 'api' in the baseURL
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -11,9 +10,12 @@ const api = axios.create({
 // Add request interceptor to include Bearer token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Safe localStorage access for Next.js
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -22,7 +24,7 @@ api.interceptors.request.use(
   }
 );
 
-// Add error interceptor for debugging
+// Improved error interceptor with token invalidation handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,6 +34,23 @@ api.interceptors.response.use(
       data: error.config?.data,
       response: error.response?.data,
     });
+
+    // Handle 401 Unauthorized errors (expired or invalid token)
+    if (error.response && error.response.status === 401) {
+      // Clear invalid token
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        
+        // Handle redirection (needs to be handled carefully in Next.js)
+        // Only redirect if not already on login page to prevent redirect loops
+        if (window.location.pathname !== '/auth/login') {
+          // Get any redirect parameter
+          const currentPath = window.location.pathname;
+          window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`;
+        }
+      }
+    }
+
     return Promise.reject(error);
   }
 );

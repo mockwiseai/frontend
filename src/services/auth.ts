@@ -23,7 +23,7 @@ export const authService = {
       throw error;
     }
   },
-
+  
   async login(email: string, password: string, loginType?: string) {
     const response = await api.post('/api/auth/login', {
       email,
@@ -35,8 +35,18 @@ export const authService = {
     }
     return response.data;
   },
-
+  
   logout() {
     localStorage.removeItem('token');
+  },
+  
+  async getProfile() {
+    try {
+      const response = await api.get('/api/auth/profile');
+      return response.data;
+    } catch (error) {
+      console.error('Get Profile Error:', error);
+      throw error;
+    }
   },
 };
