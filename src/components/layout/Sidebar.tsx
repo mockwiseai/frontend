@@ -270,7 +270,7 @@ const Sidebar = () => {
           {/* Logo Section */}
           <div className="h-14 flex items-center justify-between px-4 border-b border-gray-800">
             {!isCollapsed && (
-              <Link href="/" className="text-lg font-semibold">
+              <Link href="/" className="text-lg font-semibold text-white">
                 MockWise
               </Link>
             )}

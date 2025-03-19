@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { baseUrl } from '@/utils/baseUrl';
 import History from '@/components/dashboard/History';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 interface ProgressStats {
   codingQuestions: {
@@ -27,25 +28,27 @@ interface ProgressStats {
 // };
 
 const ProgressCard = ({ title, value, total, icon: Icon, color }: any) => (
-  <div className="bg-gradient-start/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
-    <div className="flex items-center gap-4 mb-4">
-      <div className={`p-3 rounded-lg ${color}`}>
-        <Icon className="w-6 h-6" />
+  <BackgroundGradient className="">
+    <div className=" p-6 rounded-xl">
+      <div className="flex items-center gap-4 mb-4">
+        <div className={`p-3 rounded-lg ${color}`}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="text-[#fff] text-sm">{title}</h3>
+          <p className="text-2xl text-[#fff] font-bold">{value}</p>
+        </div>
       </div>
-      <div>
-        <h3 className="text-[#fff] text-sm">{title}</h3>
-        <p className="text-2xl text-[#fff] font-bold">{value}</p>
-      </div>
+      {total && (
+        <div className="w-full bg-gray-700 rounded-full h-2">
+          <div
+            className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${(Number(value.split('/')[0]) / total) * 100}%` }}
+          />
+        </div>
+      )}
     </div>
-    {total && (
-      <div className="w-full bg-gray-700 rounded-full h-2">
-        <div
-          className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
-          style={{ width: `${(Number(value.split('/')[0]) / total) * 100}%` }}
-        />
-      </div>
-    )}
-  </div>
+  </BackgroundGradient>
 );
 
 const RecentActivity = ({ type, title, time }: any) => (

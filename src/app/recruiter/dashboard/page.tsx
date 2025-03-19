@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, Users, Calendar, Activity, Share2, ExternalLink, Trash2, Edit } from "lucide-react";
+import { Plus, Users, Calendar, Activity, Share2, ExternalLink, Trash2, Edit, Settings } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
@@ -26,15 +26,22 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Interview } from "@/types";
-import axios from "axios";
-import { API_BASE_URL } from "@/lib/utils";
 import api from "@/services/api";
+import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
+import { WobbleCard } from "@/components/ui/wobble-card";
 
 export default function Dashboard() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [search, setSearch] = useState("");
   const [shareDialog, setShareDialog] = useState<{ open: boolean; link?: string }>({
     open: false,
   });
+  const [trackDialog, setTrackDialog] = useState<{ open: boolean, candidates: any[], totalQuestions: number }>({
+    open: false,
+    candidates: [],
+    totalQuestions: 0,
+  });
+
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; interview?: Interview }>({
     open: false,
   });
@@ -121,48 +128,62 @@ export default function Dashboard() {
 
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700">
           <h2 className="text-xl font-semibold mb-4 text-gray-200">Recent Interviews</h2>
+          <PlaceholdersAndVanishInputDemo search={search} setSearch={setSearch} />
           <div className="grid gap-4">
-            {interviews.map((interview) => (
-              <div
-                key={interview._id}
-                className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700"
-              >
-                <div>
-                  <h3 className="font-medium text-gray-200">{interview.title}</h3>
-                  <p className="text-sm text-gray-400">
-                    {new Date(interview.createdAt).toLocaleDateString()} • {interview.questions.length} questions
-                    • {interview.status === "draft" ? "Draft" : "Published"}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  {interview.status === "published" && (
+            {interviews
+              ?.filter((interview) => interview.title.toLowerCase().includes(search.toLowerCase()))
+              ?.map((interview) => (
+                <div
+                  key={interview._id}
+                  className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700"
+                >
+                  <div>
+                    <h3 className="font-medium text-gray-200">{interview.title}</h3>
+                    <p className="text-sm text-gray-400">
+                      {new Date(interview.createdAt).toLocaleDateString()} • {interview.questions.length} questions
+                      • {interview.status === "draft" ? "Draft" : "Published"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {interview.status === "published" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setTrackDialog({ open: true, candidates: interview?.candidates || [], totalQuestions: interview.questions.length })}
+                        className="gap-2 bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Track
+                      </Button>
+                    )}
+                    {interview.status === "published" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShareDialog({ open: true, link: "/live/" + interview?.uniqueLink })}
+                        className="gap-2 bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                      >
+                        <Share2 className="w-4 h-4" /> Share
+                      </Button>
+                    )}
                     <Button
-                      variant="outline"
                       size="sm"
-                      onClick={() => setShareDialog({ open: true, link: "/live/" + interview?.uniqueLink })}
-                      className="gap-2 bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                      onClick={() => handleEdit(interview)}
+                      className="gap-2 bg-indigo-600 hover:bg-indigo-700"
                     >
-                      <Share2 className="w-4 h-4" /> Share
+                      <Edit className="w-4 h-4" /> Edit
                     </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    onClick={() => handleEdit(interview)}
-                    className="gap-2 bg-indigo-600 hover:bg-indigo-700"
-                  >
-                    <Edit className="w-4 h-4" /> Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(interview)}
-                    className="text-gray-400 hover:text-red-400"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(interview)}
+                      className="text-gray-400 hover:text-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             {interviews.length === 0 && (
               <div className="text-center py-8 text-gray-400">
                 No interviews created yet. Click "Create Interview" to get started.
@@ -172,6 +193,7 @@ export default function Dashboard() {
         </div>
       </div>
       <ShareDialog shareDialog={shareDialog} setShareDialog={setShareDialog} />
+      <TrackDialog trackDialog={trackDialog} setTrackDialog={setTrackDialog} candidates={trackDialog.candidates} />
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open })}>
         <AlertDialogContent className="bg-gray-800 border-gray-700">
           <AlertDialogHeader>
@@ -195,6 +217,101 @@ export default function Dashboard() {
       </AlertDialog>
     </div>
   );
+}
+
+function TrackDialog({ trackDialog, setTrackDialog, candidates }: { trackDialog: any; setTrackDialog: any; candidates: any[] }) {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <span className="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400">Completed</span>
+      case "in-progress":
+        return <span className="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-400">In Progress</span>
+      case "not-started":
+        return <span className="px-2 py-1 text-xs rounded-full bg-gray-500/20 text-gray-400">Not Started</span>
+      default:
+        return null
+    }
+  }
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "N/A"
+    return new Date(dateString).toLocaleString()
+  }
+
+  return (
+    <Dialog open={trackDialog.open} onOpenChange={(open) => setTrackDialog({ open })}>
+      <DialogContent className="bg-gray-800 border-gray-700 max-w-4xl">
+        <DialogHeader>
+          <DialogTitle className="text-gray-200">Track Interview Progress</DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Monitor candidate progress and performance in this interview
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-gray-700 text-left">
+                <th className="pb-2 text-sm font-medium text-gray-400">Candidate</th>
+                <th className="pb-2 text-sm font-medium text-gray-400">Progress</th>
+                <th className="pb-2 text-sm font-medium text-gray-400">Status</th>
+                <th className="pb-2 text-sm font-medium text-gray-400">Last Active</th>
+                <th className="pb-2 text-sm font-medium text-gray-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidates?.map((candidate, i) => (
+                <tr key={i} className="border-b border-gray-700/50 hover:bg-gray-700/20 transition-colors">
+                  <td className="py-4">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-200">{candidate.name}</span>
+                      <span className="text-xs text-gray-400">{candidate.email}</span>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-200">
+                          {candidate?.questionsAttempted || 0}/{trackDialog.totalQuestions} questions
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-1.5">
+                        <div
+                          className="bg-indigo-600 h-1.5 rounded-full"
+                          style={{ width: `${(candidate.questionsAttempted / trackDialog.totalQuestions) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4">{getStatusBadge(candidate.status)}</td>
+                  <td className="py-4 text-sm text-gray-400">{formatDate(candidate.lastActive)}</td>
+                  <td className="py-4">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        View
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {candidates?.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-gray-400">
+                    No candidates have attempted this interview yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 function ShareDialog({ shareDialog, setShareDialog }: { shareDialog: any; setShareDialog: any }) {
@@ -252,14 +369,54 @@ function StatCard({
   icon: React.ReactNode;
 }) {
   return (
-    <Card className="p-6 bg-gray-800/50 backdrop-blur-sm border-gray-700">
+    <WobbleCard
+      containerClassName=""
+      className="p-6 rounded-xl border border-gray-700"
+    >
+
       <div className="flex items-center gap-4">
         {icon}
         <div>
-          <p className="text-sm text-gray-400">{title}</p>
+          <p className="text-sm ">{title}</p>
           <p className="text-2xl font-bold text-gray-200">{value}</p>
         </div>
       </div>
-    </Card>
+
+    </WobbleCard>
+  );
+}
+
+function PlaceholdersAndVanishInputDemo({
+  search,
+  setSearch
+}: {
+  search?: string;
+  setSearch?: (search: string) => void;
+}) {
+  const placeholders = [
+    "Search by candidate name",
+    "Filter by status",
+    "Sort by date",
+  ];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch
+      ? setSearch(e.target.value)
+      : console.log("search", e.target.value);
+  };
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("search", search);
+  };
+  return (
+    <div className="flex w-full justify-start items-start my-3 px-4">
+      <div className="flex w-[600px] justify-start items-start my-3 px-4">
+        <PlaceholdersAndVanishInput
+          placeholders={placeholders}
+          onChange={handleChange}
+          onSubmit={onSubmit}
+        />
+      </div>
+    </div>
   );
 }

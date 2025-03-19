@@ -65,4 +65,12 @@ export type Interview = {
   status: "draft" | "published";
   shareLink?: string;
   createdAt: string;
+  candidates?: any[];
+  recruiterId?: string;
+  jobRole?: string;
+  totalTime?: number;
+  showTestCases?: boolean;
+  startTime?: string;
+  difficulty?: string;
+  questionsCount?: number;
 };
