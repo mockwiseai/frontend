@@ -369,8 +369,7 @@ function StatCard({
   icon: React.ReactNode;
 }) {
   return (
-    <WobbleCard
-      containerClassName=""
+    <div
       className="p-6 rounded-xl border border-gray-700"
     >
 
@@ -382,7 +381,7 @@ function StatCard({
         </div>
       </div>
 
-    </WobbleCard>
+    </div>
   );
 }
 
