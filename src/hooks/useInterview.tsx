@@ -11,7 +11,6 @@ import {
 } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Question } from '@/types/interview';
-import { API_BASE_URL } from '@/lib/utils';
 import api from '@/services/api';
 
 type InterviewSession = {
@@ -23,6 +22,10 @@ type InterviewSession = {
     completedQuestions?: string[];
     userEmail: string;
     userName: string;
+    difficulty: string;
+    showTestCases: boolean;
+    startTime?: string;
+    description?: string;
 };
 type InterviewContextType = {
     interview: InterviewSession | null;
@@ -62,10 +65,12 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
     // Fetch interview session data
     useEffect(() => {
         const fetchInterviewSession = async () => {
+            setIsLoading(true);
+            setError(null);
             try {
                 const response = await api.get(`/api/recruiter/interviews/unique-link/${params.interviewId}`);
                 const data = response.data?.data;
-                setInterview(data?.data);
+                setInterview(data);
                 setQuestions(data?.data?.questions);
                 setTimeRemaining(data?.data?.totalTime * 60);
                 setCompletedQuestions(data.data?.completedQuestions || []);
@@ -86,7 +91,7 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
             setUser(JSON.parse(userDetails));
         }
     }, []);
-    
+
     // Timer management
     useEffect(() => {
         if (!interview || interview.status !== 'in-progress') return;

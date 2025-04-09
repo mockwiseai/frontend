@@ -1,5 +1,4 @@
 import api from './api';
-import { Message } from '@/types/interview';
 
 export const interviewService = {
   async startInterview(difficulty: string) {

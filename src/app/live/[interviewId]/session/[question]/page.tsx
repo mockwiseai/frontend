@@ -31,24 +31,13 @@ export default function PracticePage() {
         const fetchQuestion = async () => {
             try {
                 setLoading(true);
-                const response = await api.get(`/api/recruiter/interviews/questions/${interview?._id}`);
+                const response = await api.get(`/api/recruiter/interviews/question/${questionId}`);
                 console.log("Response:", response);
                 
-                let questions = response.data.data;
-                console.log("Questions:", questions);
-                
-                questions = questions.map((question: Question) => {
-                    return {
-                        ...question,
-                        testCases: question.testCases.map((testCase: TestCase) => ({
-                            ...testCase,
-                            input: JSON.stringify(testCase.input),
-                            output: JSON.stringify(testCase.output),
-                        })),
-                    };
-                });
+                let question = response.data.data;
+                console.log("Questions:", question);
 
-                setQuestion(questions?.find((q: Question) => q._id === questionId));
+                setQuestion(question);
                 setLoading(false);
             } catch (err) {
                 setError("Failed to fetch question");
@@ -165,7 +154,7 @@ export default function PracticePage() {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <button
-                                onClick={() => router.push('/setup')}
+                                onClick={() => router.push('/live/' + params.interviewId + "/session")}
                                 className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
                             >
                                 <ArrowLeft size={20} />

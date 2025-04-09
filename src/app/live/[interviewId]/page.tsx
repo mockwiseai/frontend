@@ -6,18 +6,6 @@ import { Clock, User, Mail, Video, Mic, Info } from 'lucide-react';
 import UserMedia from '@/components/practice/UserMedia';
 import { API_BASE_URL } from '@/lib/utils';
 import { useInterview } from '@/hooks/useInterview';
-import api from '@/services/api';
-
-type InterviewInfo = {
-  totalTime: number;
-  id: string;
-  title: string;
-  duration: string;
-  difficulty: string;
-  showTestCases: boolean;
-  startTime?: string;
-  description?: string;
-};
 
 type UserDetails = {
   name: string;
@@ -29,10 +17,8 @@ export default function LiveInterviewSetup() {
   const params = useParams();
   const { interviewId } = params;
   
-  const [interviewInfo, setInterviewInfo] = useState<InterviewInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { setUser } = useInterview();
+  const { setUser, interview: interviewInfo, isLoading } = useInterview();
 
   const [userDetails, setUserDetails] = useState<UserDetails>({
     name: '',
@@ -42,25 +28,6 @@ export default function LiveInterviewSetup() {
   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [mediaError, setMediaError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    if (!interviewId) return; // Wait until interviewId is available
-
-    const fetchInterviewInfo = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get(`/api/recruiter/interviews/unique-link/${interviewId}`);
-        const data = response.data?.data;
-        setInterviewInfo(data); 
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch interview details');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInterviewInfo();
-  }, [interviewId]);
 
   // Handle media permissions
   useEffect(() => {
