@@ -58,6 +58,7 @@ export default function CreateInterview() {
           questionId: question?._id || undefined,
           questionType: 'CodingQuestion', // Replace with the actual question type
         })),
+        totalTime: data.duration,
         recruiterId: "6783523dd7848b25598e6a8c", // Replace with the actual recruiter ID from auth context/session
         uniqueLink: crypto.randomUUID(), // Generate a unique link for the interview
       });
@@ -71,7 +72,7 @@ export default function CreateInterview() {
           : `Your interview has been published. Share link: ${savedInterview.shareLink}`,
       });
 
-      router.push("/dashboard");
+      router.push("/recruiter/dashboard");
     } catch (error: any) {
       console.error("Error saving interview:", error);
       toast({
@@ -120,8 +121,8 @@ export default function CreateInterview() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="gap-2 text-gray-300 hover:text-white">
+          <Link href="/recruiter/dashboard">
+            <Button variant="ghost" className="gap-2 text-gray-300">
               <ArrowLeft className="w-4 h-4" /> Back to Dashboard
             </Button>
           </Link>

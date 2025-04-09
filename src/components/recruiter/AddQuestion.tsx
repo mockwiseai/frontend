@@ -116,7 +116,7 @@ export default function AddQuestionDialog({ onAdd }: { onAdd: (question: any) =>
             <DialogTrigger asChild>
                 <Button type="button" onClick={() => setShowDialog(true)}>Add Question</Button>
             </DialogTrigger>
-            <DialogContent className="bg-gray-900/50 border-gray-700 !text-[#ffff] max-w-xl">
+            <DialogContent className=" !text-[#ffff] max-w-xl bg-gray-800/50 backdrop-blur-sm border-gray-700">
                 <Form {...form}>
                     <div className="space-y-4">
                         <FormField

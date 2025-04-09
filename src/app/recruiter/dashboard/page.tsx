@@ -91,7 +91,7 @@ export default function Dashboard() {
   };
 
   const handleEdit = (interview: Interview) => {
-    router.push(`/dashboard/edit/${interview._id}`);
+    router.push(`/recruiter/interview/edit/${interview._id}`);
   };
 
   return (
