@@ -50,6 +50,7 @@ export default function CreateInterview() {
   // Save Interview API Call
   const saveInterview = async (data: Interview, status: "draft" | "published") => {
     try {
+      const token = localStorage.getItem('token');
       const response = await axios.post(`${API_BASE_URL}/recruiter/interviews/create`, {
         ...data,
         status,
@@ -61,6 +62,11 @@ export default function CreateInterview() {
         totalTime: data.duration,
         recruiterId: "6783523dd7848b25598e6a8c", // Replace with the actual recruiter ID from auth context/session
         uniqueLink: crypto.randomUUID(), // Generate a unique link for the interview
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const { data: savedInterview } = response;
