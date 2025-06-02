@@ -40,6 +40,7 @@ export interface RootState {
 }
 
 export type QuestionType = {
+  questionType: string;
   id?: string;
   _id?: string;
   type: "mcq" | "coding" | "behavioral" | "oneword" | "multiselect";
