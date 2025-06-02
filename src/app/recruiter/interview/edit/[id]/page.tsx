@@ -16,13 +16,16 @@ import { useAuth } from "@/hooks/useAuth"
 import AddQuestionDialog from "@/components/recruiter/AddQuestion"
 import { useEffect, useState } from "react"
 import api from "@/services/api"
+import { DatePicker } from "@/components/ui/date-picker"
 
 export default function EditInterview() {
     const router = useRouter()
-    const params = useParams();
+    const params = useParams()
     const { toast } = useToast()
     const { isLoading, user } = useAuth()
     const [isLoaded, setIsLoaded] = useState(false)
+    const [scheduleDate, setScheduleDate] = useState<Date | undefined>(undefined)
+    const [canEdit, setCanEdit] = useState(true)
 
     const form = useForm<any>({
         defaultValues: {
@@ -42,8 +45,16 @@ export default function EditInterview() {
         const fetchInterview = async () => {
             try {
                 const response = await api.get(`/api/recruiter/interviews/${params.id}`)
-                const interviewData = response.data?.data;
-                
+                const interviewData = response.data?.data
+
+                // Check if interview can be edited (before schedule date)
+                if (interviewData.scheduleDate) {
+                    const scheduleDateTime = new Date(interviewData.scheduleDate)
+                    const now = new Date()
+                    setCanEdit(scheduleDateTime > now)
+                    setScheduleDate(scheduleDateTime)
+                }
+
                 // Format the data for the form
                 form.reset({
                     ...interviewData,
@@ -60,7 +71,7 @@ export default function EditInterview() {
                     description: error.response?.data?.message || "Failed to load the interview.",
                     variant: "destructive",
                 })
-                // router.push("/recruiter/dashboard")
+                router.push("/recruiter/dashboard")
             }
         }
 
@@ -69,17 +80,36 @@ export default function EditInterview() {
 
     // Update Interview API Call
     const updateInterview = async (data: Interview, status: "draft" | "published") => {
+        if (!scheduleDate) {
+            toast({
+                title: "Schedule Date Required",
+                description: "Please select a schedule date for the interview.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        if (!canEdit) {
+            toast({
+                title: "Cannot Edit",
+                description: "This interview cannot be edited as it has already started or passed its scheduled date.",
+                variant: "destructive",
+            })
+            return
+        }
+
         try {
             const response = await api.put(`/api/recruiter/interviews/${params.id}`, {
                 ...data,
                 status,
+                scheduleDate: scheduleDate.toISOString(),
                 questions: data.questions.map((question: QuestionType) => ({
                     ...question,
                     questionId: question?._id || undefined,
-                    questionType: "CodingQuestion", // Replace with the actual question type
+                    questionType: question.questionType || "CodingQuestion",
                 })),
                 totalTime: data.duration,
-                recruiterId: user?.id || "6783523dd7848b25598e6a8c", // Replace with the actual recruiter ID from auth context/session
+                recruiterId: user?.id || "6783523dd7848b25598e6a8c",
             })
 
             const { data: updatedInterview } = response
@@ -134,6 +164,34 @@ export default function EditInterview() {
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
                     <p className="mt-4">Loading interview data...</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (!canEdit) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
+                <div className="container mx-auto px-4 py-8">
+                    <div className="mb-8">
+                        <Link href="/recruiter/dashboard">
+                            <Button variant="ghost" className="gap-2 text-gray-300">
+                                <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+                            </Button>
+                        </Link>
+                    </div>
+
+                    <Card className="max-w-4xl mx-auto p-6 bg-gray-800/50 backdrop-blur-sm border-gray-700">
+                        <div className="text-center py-8">
+                            <h2 className="text-2xl font-bold mb-4 text-red-400">Cannot Edit Interview</h2>
+                            <p className="text-gray-300 mb-6">
+                                This interview cannot be edited as it has already started or passed its scheduled date.
+                            </p>
+                            <Link href="/recruiter/dashboard">
+                                <Button className="bg-indigo-600 hover:bg-indigo-700">Return to Dashboard</Button>
+                            </Link>
+                        </div>
+                    </Card>
                 </div>
             </div>
         )
@@ -211,6 +269,12 @@ export default function EditInterview() {
                                 )}
                             />
 
+                            {/* Schedule Date */}
+                            <FormItem>
+                                <FormLabel className="text-gray-200">Schedule Date</FormLabel>
+                                <DatePicker date={scheduleDate} setDate={setScheduleDate} />
+                            </FormItem>
+
                             {/* Duration */}
                             <FormField
                                 control={form.control}
@@ -245,7 +309,12 @@ export default function EditInterview() {
                                     <Card key={index} className="p-4 my-4 bg-gray-900/50 border-gray-700 !text-[#ffff]">
                                         <div className="flex justify-between items-center">
                                             <div>
-                                                <h3 className="!text-[#ffff]">{question.title}</h3>
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="!text-[#ffff]">{question.title}</h3>
+                                                    <span className="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-400">
+                                                        {question.questionType || "Coding Question"}
+                                                    </span>
+                                                </div>
                                                 <p className="!text-[#ffff]">{question.description}</p>
                                             </div>
                                             <Button

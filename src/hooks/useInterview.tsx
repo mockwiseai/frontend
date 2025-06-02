@@ -131,24 +131,34 @@ export function InterviewProvider({ children }: { children: ReactNode }) {
 
     const submitAnswer = async (questionId: string, answer: string) => {
         if (!user) return;
-
+    
         try {
-            await api.post('/api/recruiter/interviews/session/candidate-submissions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    interviewId: interview?._id,
-                    questionType: 'CodingQuestion',
-                    response: answer,
-                    questionId,
-                    email: user.email,
-                    name: user.name,
-                }),
-            });
-
+            const payload = {
+                interviewId: interview?._id,
+                email: user.email,
+                name: user.name,
+                answers: [{
+                    questionId: questionId,  // Make sure this is a valid MongoDB ObjectId string
+                    questionType: "CodingQuestion",
+                    response: answer
+                }]
+            };
+            
+            const response = await api.post(
+                '/api/recruiter/interviews/session/candidate-submissions', 
+                payload
+            );
+            
+            console.log("Response:", response);  // Debug log
+            
             updateCompletedQuestions(questionId);
             setCurrentQuestion(null);
         } catch (err) {
+            if (err instanceof Error) {
+                console.error("Error details:", (err as any).response?.data || err.message);  // More detailed error logging
+            } else {
+                console.error("Error details:", err);  // Fallback for non-Error types
+            }
             setError('Failed to submit answer');
         }
     };
