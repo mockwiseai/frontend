@@ -8,7 +8,7 @@ import api from '@/services/api';
 
 type Question = {
   questionId: string;
-  questionType: 'CodingQuestion' | 'BehavioralQuestion';
+  questionType: 'CodingQuestion' | 'BehavioralQuestion' | 'SystemDesign';
   title: string;
   description: string;
   difficulty?: string;
@@ -91,7 +91,11 @@ export default function InterviewSession() {
                   <h3 className="text-lg font-semibold mb-2">{question.title}</h3>
                   <div className="text-sm text-gray-400">
                     {question.difficulty && `${question.difficulty} • `}
-                    {question.questionType === 'CodingQuestion' ? '💻 Coding' : '💭 Behavioral'}
+                    {question.questionType === 'CodingQuestion'
+                      ? '💻 Coding'
+                      : question.questionType === 'SystemDesign'
+                        ? '🏗️ System Design'
+                        : '💭 Behavioral'}
                   </div>
                 </div>
                 <button
@@ -112,7 +116,7 @@ export default function InterviewSession() {
         <div className='flex justify-center mt-8'>
           <button
             onClick={() => {
-              
+
               router.push(`/live/${interview?._id}/complete`)
             }}
             className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"

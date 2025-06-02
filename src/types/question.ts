@@ -10,6 +10,7 @@ export interface TestCase {
 }
 
 export interface Question {
+  questionType: any;
   _id: string;
   title: string;
   description: string;

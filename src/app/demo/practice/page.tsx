@@ -44,7 +44,7 @@ export default function PracticePage() {
                     `${baseUrl}/api/questions/coding/random?difficulty=${difficulty}`,
                     {
                         headers: {
-                            Authorization: `Bearer ${token}`, // Attach the Bearer token
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );
